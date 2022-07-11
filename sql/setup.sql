@@ -11,7 +11,7 @@ CREATE TABLE users (
 
 CREATE TABLE todos (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id BIGINT ,
+  user_id BIGINT NOT NULL,
   description VARCHAR NOT NULL,
   complete BOOLEAN NOT NULL DEFAULT(false)
 );
