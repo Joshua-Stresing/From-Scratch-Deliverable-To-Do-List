@@ -48,7 +48,7 @@ describe('todo test suite', () => {
 
   it('Test my get list of todos for user', async () => {
     const [agent, user] = await LoggedIn();
-    const testingClient = await UserService.create(mockUser2);
+    const testinguser = await UserService.create(mockUser2);
     const testData = await Todo.insert({
       description: 'Finish App',
       user_id: user.id,
@@ -56,12 +56,47 @@ describe('todo test suite', () => {
     });
     await Todo.insert({
       description: 'Get a job',
-      user_id: testingClient.id,
+      user_id: testinguser.id,
       complete: false,
     });
     const data = await agent.get('/api/v1/todos');
     expect(data.status).toEqual(200);
     expect(data.body).toEqual([testData]);
+  });
+
+  it('Test to check if not logged in', async () => {
+    const data = await request(app).get('/api/v1/todos');
+    expect(data.status).toEqual(401);
+  });
+
+  it('Test the update todo for the user', async () => {
+    const [agent, user] = await LoggedIn();
+    const data = await Todo.insert({
+      description: 'Test Edit',
+      user_id: user.id,
+      complete: true,
+    });
+    const resp = await agent
+      .put(`/api/v1/todos/${data.id}`)
+      .send({ description: 'Edited', complete: false });
+    // expect(resp.status).toEqual(200);
+    expect(resp.body).toEqual({
+      ...data,
+      description: 'Edited',
+      complete: false,
+    });
+  });
+
+  it.only('Test the delete for a user.', async () => {
+    const [agent, user] = await LoggedIn();
+    const todo = await Todo.insert({
+      description: 'Finish App',
+      user_id: user.id,
+    });
+    const resp = await agent.delete(`/api/v1/todos/${todo.id}`);
+    // expect(resp.status).toBe(200);
+    const remove = await Todo.getById(todo.id);
+    expect(remove).toBeNull();
   });
 
   afterAll(() => {
