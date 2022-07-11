@@ -87,14 +87,14 @@ describe('todo test suite', () => {
     });
   });
 
-  it.only('Test the delete for a user.', async () => {
+  it('Test the delete for a user.', async () => {
     const [agent, user] = await LoggedIn();
     const todo = await Todo.insert({
       description: 'Finish App',
       user_id: user.id,
     });
     const resp = await agent.delete(`/api/v1/todos/${todo.id}`);
-    // expect(resp.status).toBe(200);
+    expect(resp.status).toBe(200);
     const remove = await Todo.getById(todo.id);
     expect(remove).toBeNull();
   });
